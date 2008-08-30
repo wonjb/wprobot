@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "wpRobot(ver1.0).h"
+#include "wpRobot(ver2.0).h"
 #include "Mouse.h"
 
 

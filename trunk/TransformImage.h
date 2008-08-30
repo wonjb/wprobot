@@ -14,16 +14,16 @@ public:
 
 	void findSkinColor()	{ ThresholdYCbCr(); }
 	void deleteNoise()		{ Morphology(); /*deleteHole();*/ Labeling(); }
-	CvPoint findCenter();
 	CHandPoint findFinger();
 
+private:
 	void ThresholdYCbCr(int cbmin = 77, int cbmax = 127, int crmin = 133, int crmax = 173);
 	void Labeling();
 	void Morphology();
 	void deleteHole();
 	void drawHandLine();
-
-//	BOOL CurToPast(CvPoint* past, CvPoint* cur) { *past = *cur;	return TRUE; }
+	void Thinning();
+	CvPoint findCenter();
 
 private:
 	CDC* m_pDC;

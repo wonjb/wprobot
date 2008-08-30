@@ -8,9 +8,13 @@
 #define new DEBUG_NEW
 #endif
 
+#define WINNAME		"Binary Test"
+
+
 CTransformImage::CTransformImage(void)
 : m_image(NULL), m_transImage(NULL)
 {
+	cvNamedWindow(WINNAME);
 }
 
 CTransformImage::~CTransformImage(void)
@@ -19,6 +23,8 @@ CTransformImage::~CTransformImage(void)
 		cvReleaseImage(&m_image);
 	if(!m_transImage)
 		cvReleaseImage(&m_transImage);
+
+	cvDestroyWindow(WINNAME);
 }
 
 void CTransformImage::setDC(CDC* dc)
@@ -33,9 +39,11 @@ void CTransformImage::setOriginImage(IplImage* image)
 
 void CTransformImage::drawTransImage(int x, int y, int width, int height)
 {
-	CvvImage image;
-	image.CopyOf(m_transImage, m_transImage->nChannels*8);
-	image.Show(m_pDC->GetSafeHdc(), x, y, width, height);
+// 	CvvImage image;
+// 	image.CopyOf(m_transImage, m_transImage->nChannels*8);
+// 	image.Show(m_pDC->GetSafeHdc(), x, y, width, height);
+
+	cvShowImage(WINNAME, m_transImage);
 }
 
 void CTransformImage::ThresholdYCbCr(int cbmin /*= 77*/, int cbmax /*= 127*/, int crmin /*= 133*/, int crmax /*= 173*/)
@@ -106,7 +114,7 @@ void CTransformImage::Labeling()
 			ch = m_transImage->imageData[iByWidth+j];
 			if(visited[iByWidth+j] != 0 || ch != 255)		// 지나갔던 점이거나 까만점이면
 				continue;
-			
+
 			stack.setEmpty();
 
 			area = 1;
@@ -185,7 +193,7 @@ void CTransformImage::drawHandLine()
 	CvSeq* contours = 0;
 
 	cvFindContours(m_transImage, storage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-//			Drawing image, point, external color,     internal color,      ?, thickness, linetype, offset
+	//			Drawing image, point, external color,     internal color,      ?, thickness, linetype, offset
 	cvDrawContours(m_image, contours, CV_RGB(255,242,0), CV_RGB(255,242,0), 1, 2, CV_AA);
 
 	cvReleaseMemStorage(&storage);
@@ -196,10 +204,10 @@ CvPoint CTransformImage::findCenter()
 	IplImage* dist8u  = cvCloneImage(m_transImage);
 	IplImage* dist32f = cvCreateImage(cvGetSize(m_transImage), IPL_DEPTH_32F, 1);
 	IplImage* dist32s = cvCreateImage(cvGetSize(m_transImage), IPL_DEPTH_32S, 1);
-	
+
 	// 거리 변환 행렬
 	float mask[3] = {1.f, 1.5f, 0};
-	
+
 	// 거리 변환 함수 사용
 	cvDistTransform(m_transImage, dist32f, CV_DIST_USER, 3, mask, NULL);
 
@@ -244,6 +252,8 @@ CvPoint CTransformImage::findCenter()
 
 CHandPoint CTransformImage::findFinger()
 {
+	findCenter();
+
 	if(!m_transImage)
 		return CHandPoint();
 
@@ -263,16 +273,10 @@ CHandPoint CTransformImage::findFinger()
 			if(ch == 255)
 			{
 				moveX = x, moveY = y;
-				if(x < m_center.x-50)
+				if(x < m_center.x-50 && y < m_center.y+30)
 					bClick = TRUE;
 				break;
 			}
-
-// 			CvBox2D box;
-// 			box.center = cvPoint2D32f(x, y);
-// 			box.size   = cvSize2D32f(2, 2);
-// 			box.angle  = 90;
-// 			cvEllipseBox(m_image, box, CV_RGB(0,255,255), 1);
 		}
 
 		if(moveY != y)
@@ -280,7 +284,7 @@ CHandPoint CTransformImage::findFinger()
 	}
 
 	// 좌표가 조금씩 흔들리는 것을 방지하기 위한 부분
-	if(abs(m_pastPt.x-moveX) < 1 || abs(m_pastPt.y-moveY) < 1)
+	if(abs(m_pastPt.x-moveX) < 2 || abs(m_pastPt.y-moveY) < 2)
 		moveX = m_pastPt.x, moveY = m_pastPt.y;
 
 	m_pastPt.x = moveX, m_pastPt.y = moveY;
@@ -293,6 +297,7 @@ CHandPoint CTransformImage::findFinger()
 
 	return CHandPoint(moveX, height-moveY, bClick, bWheel);
 }
+
 
 void CTransformImage::deleteHole()
 {
@@ -320,6 +325,7 @@ void CTransformImage::deleteHole()
 			continue;
 
 		for(int x = st.x; x < ed.x; ++x)
-			m_transImage->imageData[y*width+x] = 255;
+			m_transImage->imageData[y*width+x] = (unsigned char)255;
 	}
 }
+

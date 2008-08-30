@@ -23,6 +23,7 @@
 #include <afxext.h>         // MFC 확장입니다.
 
 
+#include <afxdisp.h>        // MFC 자동화 클래스입니다.
 
 
 

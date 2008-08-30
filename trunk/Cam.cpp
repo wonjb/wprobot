@@ -2,16 +2,12 @@
 //
 
 #include "stdafx.h"
-#include "wpRobot(ver1.0).h"
+#include "wpRobot(ver2.0).h"
 #include "Cam.h"
+#include "TransformImage.h"
+#include "Transmit.h"
 
-#include "Pattern.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-CTransformImage g_transform;
 
 // CCam
 
@@ -42,7 +38,7 @@ int CCam::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
-	int nCamCount = cvcamGetCamerasCount();			//////////////////// Why? 1이 리턴되는 걸까?
+	int nCamCount = cvcamGetCamerasCount();
 	if(nCamCount == 0)
 	{
 		MessageBox(_T("No Connected Camera"));
@@ -69,6 +65,7 @@ void CCam::OnDestroy()
 	cvcamExit();
 }
 
+CTransformImage g_transform;
 void cvcamCallBack(IplImage* image)
 {
 	g_transform.setOriginImage(image);
@@ -76,15 +73,7 @@ void cvcamCallBack(IplImage* image)
 	g_transform.deleteNoise();
 	g_transform.drawTransImage(550, 250, 320, 230);
 
-// 	CvPoint center = g_transform.findCenter();
-// 	std::vector<CvPoint> ptList = g_transform.findFinger();
-//
-// 	TCHAR buf[256] = {0,};
-// 	swprintf(buf, sizeof(buf), _T("%d\n"), ptList.size());
-// 	::OutputDebugString(buf);
-
-//	g_transform.findCenter();
-//	g_transform.findFinger();
-	CPattern pattern(g_transform.findCenter(), g_transform.findFinger());
-	pattern.getMotion();
+	CTransmit transmit(g_transform.findFinger());
+	transmit.transmitWindow();
+//	transmit.transmitRobot();
 }
