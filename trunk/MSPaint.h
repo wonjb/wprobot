@@ -23,6 +23,8 @@ public:
 private:
 	CMouse m_Mouse;			// mouse Window
 	CRect  m_region;		// MSPaint 전체 영역
+	CRect  m_redRegn, m_blueRegn, m_pupleRegn;		// 색상 영역
+
 	int    m_nX, m_nY;		// 바로 전 좌표를 저장하기 위한 변수
 	COLORREF m_color;		// Pen Color
 

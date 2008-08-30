@@ -5,6 +5,8 @@
 #include "wpRobot(ver2.0).h"
 #include "MSPaint.h"
 
+#include "wpRobot(ver2.0)Dlg.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -20,6 +22,9 @@ IMPLEMENT_DYNAMIC(CMSPaint, CWnd)
 
 CMSPaint::CMSPaint()
 : m_color(RGB(0,0,0))
+, m_redRegn  (620, 20,640, 80)
+, m_blueRegn (620,100,640,160)
+, m_pupleRegn(620,180,640,240)
 {
 
 }
@@ -83,15 +88,23 @@ void CMSPaint::Initialize()
 	m_bufBmp.CreateCompatibleBitmap(&dc, m_region.Width(), m_region.Height());
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
 
-	CBrush brush;
+	CBrush brush, redBrush, blueBrush, pupleBrush;
 	brush.CreateSolidBrush(RGB(220,235,235));
-	
+	redBrush.CreateSolidBrush(RGB(255,115,115));
+	blueBrush.CreateSolidBrush(RGB(115,115,255));
+	pupleBrush.CreateSolidBrush(RGB(225,50,225));
 	CBrush* pOldBrush = (CBrush*)bufDC.SelectObject(&brush);
 
 	bufDC.FillRect(m_region, &brush);
+	bufDC.FillRect(m_redRegn, &redBrush);
+	bufDC.FillRect(m_blueRegn, &blueBrush);
+	bufDC.FillRect(m_pupleRegn, &pupleBrush);
 
 	bufDC.SelectObject(pOldBrush);
 	brush.DeleteObject();
+	redBrush.DeleteObject();
+	blueBrush.DeleteObject();
+	pupleBrush.DeleteObject();
 
 	bufDC.SelectObject(pOldBmp);
 	bufDC.DeleteDC();
@@ -104,8 +117,21 @@ void CMSPaint::setPointer(CHandPoint handPt)
 	pt.x = handPt.m_nX*(m_region.Width()/240.f);
 	pt.y = handPt.m_nY*(m_region.Height()/180.f);
 
-// 	if(m_redRegn.PtInRect(pt))
-// 	{	m_redWnd.Animation();	return;	}
+	if(pt.x >= m_region.Width()-1)
+		pt.x = m_region.Width()-1;
+	if(pt.y >= m_region.Height()-1)
+		pt.y = m_region.Height()-1;
+
+	TCHAR buf[256] = {0,};
+	swprintf(buf, _T("%d\t%d\t%s\t%s\n"), pt.x, pt.y, handPt.m_bClick ? _T("TRUE") : _T("FALSE"), handPt.m_bWheel ? _T("TRUE") : _T("FALSE"));
+	::OutputDebugString(buf);
+
+  	if(m_redRegn.PtInRect(pt))
+  	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->m_redWnd.Animation();*/	handPt.m_bClick = FALSE;	}
+	else if(m_blueRegn.PtInRect(pt))
+	{	handPt.m_bClick = FALSE;	}
+	else if(m_pupleRegn.PtInRect(pt))
+	{	handPt.m_bClick = FALSE;	}
 
 	if(handPt.m_bClick)
 		clickPointer(pt.x,pt.y);
