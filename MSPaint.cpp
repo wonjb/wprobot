@@ -22,9 +22,9 @@ CMSPaint::CMSPaint()
 , m_redWnd(RGB(255,115,115))
 , m_blueWnd(RGB(115,115,255))
 , m_pupleWnd(RGB(225,50,225))
-, m_redRegn(620,20,700,80)
-, m_blueRegn(620,100,700,160)
-, m_pupleRegn(620,180,700,240)
+, m_redRegn(620,20,900,80)
+, m_blueRegn(620,100,900,160)
+, m_pupleRegn(620,180,900,240)
 {
 
 }
