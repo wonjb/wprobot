@@ -1,5 +1,5 @@
 #pragma once
-#include "TransformImage.h"
+
 
 // CCam
 
@@ -21,7 +21,3 @@ public:
 
 
 void cvcamCallBack(IplImage* image);
-IplImage* findSkinColor(IplImage* image);
-IplImage* deleteNoise  (IplImage* image);
-
-extern CTransformImage g_transform;
