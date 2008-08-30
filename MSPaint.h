@@ -1,6 +1,5 @@
 #pragma once
 #include "Mouse.h"
-#include "ColorWnd.h"
 #include "HandPoint.h"
 
 
@@ -23,8 +22,6 @@ public:
 
 private:
 	CMouse m_Mouse;			// mouse Window
-	CColorWnd m_redWnd,  m_blueWnd,  m_pupleWnd;
-	CRect     m_redRegn, m_blueRegn, m_pupleRegn;
 	CRect  m_region;		// MSPaint 전체 영역
 	int    m_nX, m_nY;		// 바로 전 좌표를 저장하기 위한 변수
 	COLORREF m_color;		// Pen Color
@@ -36,6 +33,7 @@ protected:
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnPaint();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
 
 

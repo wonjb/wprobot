@@ -5,6 +5,7 @@
 #include "wpRobot(ver2.0).h"
 #include "MSPaint.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -19,12 +20,6 @@ IMPLEMENT_DYNAMIC(CMSPaint, CWnd)
 
 CMSPaint::CMSPaint()
 : m_color(RGB(0,0,0))
-, m_redWnd(RGB(255,115,115))
-, m_blueWnd(RGB(115,115,255))
-, m_pupleWnd(RGB(225,50,225))
-, m_redRegn(620,20,900,80)
-, m_blueRegn(620,100,900,160)
-, m_pupleRegn(620,180,900,240)
 {
 
 }
@@ -38,7 +33,7 @@ CMSPaint::~CMSPaint()
 BEGIN_MESSAGE_MAP(CMSPaint, CWnd)
 	ON_WM_ERASEBKGND()
 	ON_WM_CREATE()
-	ON_WM_PAINT()
+//	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -55,19 +50,26 @@ int CMSPaint::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if(!m_Mouse.Create(NULL, NULL, WS_CHILD|WS_VISIBLE, CRect(0,0,MOUSEWIDTH,MOUSEHEIGHT), this, 1))
 		return -1;
 
-	if(!m_redWnd.Create(NULL, NULL, WS_CHILD|WS_VISIBLE, m_redRegn, this, 1))
-		return -1;
-	if(!m_blueWnd.Create(NULL, NULL, WS_CHILD|WS_VISIBLE, m_blueRegn, this, 1))
-		return -1;
-	if(!m_pupleWnd.Create(NULL, NULL, WS_CHILD|WS_VISIBLE, m_pupleRegn, this, 1))
-		return -1;
-
 	this->GetClientRect(&m_region);
 	Initialize();
 
 	return 0;
 }
 
+BOOL CMSPaint::OnEraseBkgnd(CDC* pDC)
+{
+	CDC bufDC;
+	bufDC.CreateCompatibleDC(pDC);
+
+	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
+
+	pDC->BitBlt(0, 0, m_region.Width(), m_region.Height(), &bufDC, 0, 0, SRCCOPY);
+
+	bufDC.SelectObject(pOldBmp);
+	bufDC.DeleteDC();
+
+	return TRUE;
+}
 
 // 사용자 정의 함수
 
@@ -102,8 +104,8 @@ void CMSPaint::setPointer(CHandPoint handPt)
 	pt.x = handPt.m_nX*(m_region.Width()/240.f);
 	pt.y = handPt.m_nY*(m_region.Height()/180.f);
 
-	if(m_redRegn.PtInRect(pt))
-	{	m_redWnd.Animation();	return;	}
+// 	if(m_redRegn.PtInRect(pt))
+// 	{	m_redWnd.Animation();	return;	}
 
 	if(handPt.m_bClick)
 		clickPointer(pt.x,pt.y);
@@ -170,19 +172,19 @@ void CMSPaint::wheelPointer(int x, int y)
 
 }
 
-void CMSPaint::OnPaint()
-{
-	CPaintDC dc(this); // device context for painting
-	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
-	// 그리기 메시지에 대해서는 CWnd::OnPaint()을(를) 호출하지 마십시오.
-
-	CDC bufDC;
-	bufDC.CreateCompatibleDC(&dc);
-
-	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
-
-	dc.BitBlt(0, 0, m_region.Width(), m_region.Height(), &bufDC, 0, 0, SRCCOPY);
-
-	bufDC.SelectObject(pOldBmp);
-	bufDC.DeleteDC();
-}
+// void CMSPaint::OnPaint()
+// {
+// 	CPaintDC dc(this); // device context for painting
+// 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+// 	// 그리기 메시지에 대해서는 CWnd::OnPaint()을(를) 호출하지 마십시오.
+// 
+// 	CDC bufDC;
+// 	bufDC.CreateCompatibleDC(&dc);
+// 
+// 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
+// 
+// 	dc.BitBlt(0, 0, m_region.Width(), m_region.Height(), &bufDC, 0, 0, SRCCOPY);
+// 
+// 	bufDC.SelectObject(pOldBmp);
+// 	bufDC.DeleteDC();
+// }
