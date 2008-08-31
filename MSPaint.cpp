@@ -127,11 +127,11 @@ void CMSPaint::setPointer(CHandPoint handPt)
 	::OutputDebugString(buf);
 
   	if(m_redRegn.PtInRect(pt))
-  	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->m_redWnd.Animation();*/	handPt.m_bClick = FALSE;	}
+	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::RED);	handPt.m_bClick = FALSE;	}
 	else if(m_blueRegn.PtInRect(pt))
-	{	handPt.m_bClick = FALSE;	}
+	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLUE);	handPt.m_bClick = FALSE;	}
 	else if(m_pupleRegn.PtInRect(pt))
-	{	handPt.m_bClick = FALSE;	}
+	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::PUPLE);	handPt.m_bClick = FALSE;	}
 
 	if(handPt.m_bClick)
 		clickPointer(pt.x,pt.y);
