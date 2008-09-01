@@ -264,7 +264,7 @@ CHandPoint CTransformImage::findFinger()
 	unsigned char ch;
 	for(int y = m_center.y; y < height; ++y)
 	{
-		for(int x = m_center.x-100; x < m_center.x+50; ++x)
+		for(int x = m_center.x-100; x < m_center.x+20; ++x)
 		{
 			if(x < 0 || x >= width || y < 0 || y >= height)
 				continue;
@@ -283,6 +283,20 @@ CHandPoint CTransformImage::findFinger()
 			break;
 	}
 
+	int y = abs(moveY-m_center.y)/2+m_center.y;
+	for(int x = moveX+20; x < moveX+50; ++x)
+	{
+		if(x < 0 || x >= width)
+			continue;
+
+		ch = m_transImage->imageData[y*width+x];
+		if(ch == 255)
+		{
+			bWheel = TRUE;
+			break;
+		}
+	}
+
 	// 좌표가 조금씩 흔들리는 것을 방지하기 위한 부분
 	if(abs(m_pastPt.x-moveX) < 2 || abs(m_pastPt.y-moveY) < 2)
 		moveX = m_pastPt.x, moveY = m_pastPt.y;
@@ -297,7 +311,6 @@ CHandPoint CTransformImage::findFinger()
 
 	return CHandPoint(moveX, height-moveY, bClick, bWheel);
 }
-
 
 void CTransformImage::deleteHole()
 {
