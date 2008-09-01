@@ -126,12 +126,12 @@ void CMSPaint::setPointer(CHandPoint handPt)
 	swprintf(buf, _T("%d\t%d\t%s\t%s\n"), pt.x, pt.y, handPt.m_bClick ? _T("TRUE") : _T("FALSE"), handPt.m_bWheel ? _T("TRUE") : _T("FALSE"));
 	::OutputDebugString(buf);
 
-  	if(m_redRegn.PtInRect(pt))
-	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::RED);	handPt.m_bClick = FALSE;	}
-	else if(m_blueRegn.PtInRect(pt))
-	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLUE);	handPt.m_bClick = FALSE;	}
-	else if(m_pupleRegn.PtInRect(pt))
-	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::PUPLE);	handPt.m_bClick = FALSE;	}
+//   	if(m_redRegn.PtInRect(pt))
+// 	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::RED);	handPt.m_bClick = FALSE;	}
+// 	else if(m_blueRegn.PtInRect(pt))
+// 	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLUE);	handPt.m_bClick = FALSE;	}
+// 	else if(m_pupleRegn.PtInRect(pt))
+// 	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::PUPLE);	handPt.m_bClick = FALSE;	}
 
 	if(handPt.m_bClick)
 		clickPointer(pt.x,pt.y);
@@ -139,8 +139,6 @@ void CMSPaint::setPointer(CHandPoint handPt)
 // 		wheelPointer(handPt.x, handPt.y);
 	else
 		movePointer(pt.x,pt.y);
-
-	m_pastPt.x = pt.x, m_pastPt.y = pt.y;
 }
 
 void CMSPaint::movePointer(int x, int y)
@@ -149,9 +147,12 @@ void CMSPaint::movePointer(int x, int y)
 
 	CDC bufDC;
 	bufDC.CreateCompatibleDC(&dc);
+
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
 
 	m_Mouse.MoveWindow(x, y, MOUSEWIDTH, MOUSEHEIGHT, FALSE);
+
+	m_nX = x, m_nY = y;
 
 	bufDC.SelectObject(pOldBmp);
 	bufDC.DeleteDC();
@@ -165,19 +166,23 @@ void CMSPaint::clickPointer(int x, int y)
 
 	CDC bufDC;
 	bufDC.CreateCompatibleDC(&dc);
+
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
 
 	CPen pen;
 	pen.CreatePen(PS_SOLID, 1, m_color);
+
 	CPen* pOldPen = (CPen*)bufDC.SelectObject(&pen);
 
-	if(m_pastPt.x > m_region.Width() || m_pastPt.y > m_region.Height())
-		m_pastPt.x  = x, m_pastPt.y = y;
+	if(m_nX > m_region.Width() || m_nY > m_region.Height())
+		m_nX = x, m_nY = y;
 
-	bufDC.MoveTo(m_pastPt.x, m_pastPt.y);
+	bufDC.MoveTo(m_nX,m_nY);
 	bufDC.LineTo(x,y);
 
 	m_Mouse.MoveWindow(x, y, MOUSEWIDTH, MOUSEHEIGHT, FALSE);
+
+	m_nX = x, m_nY = y;
 
 	bufDC.SelectObject(pOldPen);
 	pen.DeleteObject();
