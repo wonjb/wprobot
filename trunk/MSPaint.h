@@ -13,10 +13,11 @@ public:
 	CMSPaint();
 	virtual ~CMSPaint();
 
-	void setPointer  (CHandPoint handPt);
+//	void setPointer  (CHandPoint handPt);
+	void convertScreenToMSPaintPt(int* x, int* y);
 	void movePointer (int x, int y);
 	void clickPointer(int x, int y);
-	void wheelPointer(int x, int y);
+//	void wheelPointer();
 
 	void Initialize();
 
@@ -25,10 +26,11 @@ private:
 	CRect  m_region;		// MSPaint 전체 영역
 	CRect  m_redRegn, m_blueRegn, m_pupleRegn;		// 색상 영역
 
-	int    m_nX, m_nY;		// 바로 전 좌표를 저장하기 위한 변수
 	COLORREF m_color;		// Pen Color
 
 	CBitmap m_bufBmp;		// 더블버퍼링을 위한 Bitmap
+
+	POINT m_pastPt;	// 바로 전 좌표를 저장하기 위한 변수
 
 protected:
 	DECLARE_MESSAGE_MAP()
