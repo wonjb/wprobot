@@ -139,6 +139,8 @@ void CMSPaint::setPointer(CHandPoint handPt)
 // 		wheelPointer(handPt.x, handPt.y);
 	else
 		movePointer(pt.x,pt.y);
+
+	m_pastPt.x = pt.x, m_pastPt.y = pt.y;
 }
 
 void CMSPaint::movePointer(int x, int y)
@@ -147,12 +149,9 @@ void CMSPaint::movePointer(int x, int y)
 
 	CDC bufDC;
 	bufDC.CreateCompatibleDC(&dc);
-
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
 
 	m_Mouse.MoveWindow(x, y, MOUSEWIDTH, MOUSEHEIGHT, FALSE);
-
-	m_nX = x, m_nY = y;
 
 	bufDC.SelectObject(pOldBmp);
 	bufDC.DeleteDC();
@@ -166,23 +165,19 @@ void CMSPaint::clickPointer(int x, int y)
 
 	CDC bufDC;
 	bufDC.CreateCompatibleDC(&dc);
-
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
 
 	CPen pen;
 	pen.CreatePen(PS_SOLID, 1, m_color);
-
 	CPen* pOldPen = (CPen*)bufDC.SelectObject(&pen);
 
-	if(m_nX > m_region.Width() || m_nY > m_region.Height())
-		m_nX = x, m_nY = y;
+	if(m_pastPt.x > m_region.Width() || m_pastPt.y > m_region.Height())
+		m_pastPt.x  = x, m_pastPt.y = y;
 
-	bufDC.MoveTo(m_nX,m_nY);
+	bufDC.MoveTo(m_pastPt.x, m_pastPt.y);
 	bufDC.LineTo(x,y);
 
 	m_Mouse.MoveWindow(x, y, MOUSEWIDTH, MOUSEHEIGHT, FALSE);
-
-	m_nX = x, m_nY = y;
 
 	bufDC.SelectObject(pOldPen);
 	pen.DeleteObject();
