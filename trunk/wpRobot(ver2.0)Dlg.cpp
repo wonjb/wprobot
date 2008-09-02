@@ -99,5 +99,20 @@ HCURSOR CwpRobotver20Dlg::OnQueryDragIcon()
 void CwpRobotver20Dlg::RunSettingDlg()
 {
 //	m_setting.DoModal();
+	m_setting->ShowWindow(SW_SHOW);
 	m_setting->SetFocus();
+}
+
+void CwpRobotver20Dlg::UnRunSettingDlg()
+{
+	//	m_setting.DoModal();
+	m_setting->ShowWindow(SW_HIDE);
+	this->SetFocus();
+}
+
+void CwpRobotver20Dlg::PostNcDestroy()
+{
+	delete m_setting;
+
+	CDialog::PostNcDestroy();
 }

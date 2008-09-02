@@ -17,10 +17,7 @@ public:
 
 // 작업입니다.
 public:
-	void saveMotion(int time);
-
-public:
-	CvvImage m_view;
+	void drawImage(IplImage* image);
 
 
 protected:
@@ -28,7 +25,5 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	virtual BOOL OnInitDialog();
-	afx_msg void OnPaint();
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnBnClickedCancel();
 };

@@ -32,6 +32,8 @@ public:
 
 	void ColorAnimation(COLOR color);
 	void RunSettingDlg();
+	void UnRunSettingDlg();
+	
 
 // 구현입니다.
 protected:
@@ -42,4 +44,6 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void PostNcDestroy();
 };
