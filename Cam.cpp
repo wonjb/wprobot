@@ -5,6 +5,8 @@
 #include "wpRobot(ver2.0).h"
 #include "Cam.h"
 
+#include "wpRobot(ver2.0)Dlg.h"
+
 
 
 // CCam
@@ -71,6 +73,8 @@ void cvcamCallBack(IplImage* image)
 	g_transform.findSkinColor();
 	g_transform.deleteNoise();
 	g_transform.drawTransImage(550, 250, 320, 230);
+
+	((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_setting->drawImage(g_transform.m_transImage);
 
 	g_transmit.setHandPointer(g_transform.findFinger());
 	g_transmit.transmitWindow();

@@ -21,4 +21,6 @@ private:
 	CRect      m_robotRegn;
 
 	COLOR      m_color;
+public:
+	BOOL       m_continue;
 };

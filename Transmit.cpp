@@ -5,6 +5,7 @@
 #include "wpRobot(ver2.0)Dlg.h"
 
 CTransmit::CTransmit()
+: m_continue(FALSE)
 {
 }
 
@@ -12,15 +13,27 @@ CTransmit::~CTransmit(void)
 {
 }
 
+DWORD WINAPI waitSettingDlg(LPVOID lpParam)
+{
+	HANDLE hEvent = ::CreateEvent(NULL, FALSE, FALSE, _T("ENDSETTING"));
+	::WaitForSingleObject(hEvent, INFINITE);
+
+	CTransmit* pTransmit = (CTransmit*)lpParam;
+	pTransmit->m_continue = FALSE;
+
+	return 0;
+}
+
 void CTransmit::setHandPointer(CHandPoint handPt)
 {
 	m_handPt = handPt;
- 	if(m_handPt.m_bWheel)		// setting 창인지 check
+ 	if(m_handPt.m_bWheel && m_continue == FALSE)		// setting 창인지 check
 	{
 		((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->RunSettingDlg();
-		m_handPt.m_bWheel = FALSE;
+		::CloseHandle(::CreateThread(NULL, NULL, waitSettingDlg, this, 0, 0));
+		m_continue = TRUE;
 	}
-	
+
 	m_color = (COLOR)((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint.inColorRegn(handPt.m_nX, handPt.m_nY);
 
 	setWindowRegn();
@@ -39,6 +52,9 @@ void CTransmit::setRobotRegn()
 
 void CTransmit::transmitWindow()
 {
+	if(m_continue == TRUE)
+		return;
+
 	unsigned short x, y;
 	// cam input 크기 320, 240 -> mspaint region 으로 변환
 	x = m_handPt.m_nX*(m_winRegn.Width()/240.f);
@@ -57,6 +73,9 @@ void CTransmit::transmitWindow()
 
 void CTransmit::transmitRobot()
 {
+	if(m_continue == TRUE)
+		return;
+
 	unsigned short x, y;
 	// cam input 크기 240, 180 -> Robot region 으로 변환
 	x = m_handPt.m_nX*(m_robotRegn.Width()/240.f);
