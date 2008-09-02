@@ -1,5 +1,6 @@
 #pragma once
-
+#include "TransformImage.h"
+#include "Transmit.h"
 
 // CCam
 
@@ -19,5 +20,6 @@ public:
 	afx_msg void OnDestroy();
 };
 
-
+extern CTransformImage g_transform;
+extern CTransmit       g_transmit;
 void cvcamCallBack(IplImage* image);

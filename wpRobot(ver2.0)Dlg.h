@@ -22,15 +22,16 @@ public:
 
 // 작업입니다.
 public:
-	enum COLOR{ RED, BLUE, PUPLE };
+	enum COLOR{ RED = 1, BLUE = 2, PUPLE = 4, BLACK = 8, NOTHING = 0 };
 public:
-	CCam     m_cam;
-	CMSPaint m_paint;
-	CSettingDlg m_setting;
+	CCam         m_cam;
+	CMSPaint     m_paint;
+	CSettingDlg* m_setting;
 
 	CRect    m_region;
 
 	void ColorAnimation(COLOR color);
+	void RunSettingDlg();
 
 // 구현입니다.
 protected:

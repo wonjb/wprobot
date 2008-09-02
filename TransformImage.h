@@ -25,10 +25,11 @@ private:
 	void Thinning();
 	CvPoint findCenter();
 
+public:
+	IplImage* m_transImage;
 private:
 	CDC* m_pDC;
 	IplImage* m_image;
-	IplImage* m_transImage;
 
 	CvPoint m_center;
 	CvPoint m_pastPt;

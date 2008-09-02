@@ -22,9 +22,10 @@ IMPLEMENT_DYNAMIC(CMSPaint, CWnd)
 
 CMSPaint::CMSPaint()
 : m_color(RGB(0,0,0))
-, m_redRegn  (620, 20,640, 80)
-, m_blueRegn (620,100,640,160)
-, m_pupleRegn(620,180,640,240)
+, m_redRegn  (620, 20,640, 60)
+, m_blueRegn (620, 80,640,120)
+, m_pupleRegn(620,140,640,180)
+, m_blackRegn(620,200,640,240)
 {
 
 }
@@ -88,78 +89,59 @@ void CMSPaint::Initialize()
 	m_bufBmp.CreateCompatibleBitmap(&dc, m_region.Width(), m_region.Height());
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
 
-	CBrush brush, redBrush, blueBrush, pupleBrush;
+	CBrush brush, redBrush, blueBrush, pupleBrush, blackBrush;
 	brush.CreateSolidBrush(RGB(220,235,235));
-	redBrush.CreateSolidBrush(RGB(255,115,115));
-	blueBrush.CreateSolidBrush(RGB(115,115,255));
-	pupleBrush.CreateSolidBrush(RGB(225,50,225));
+	redBrush.CreateSolidBrush  (RGB(255,115,115));
+	blueBrush.CreateSolidBrush (RGB(115,115,255));
+	pupleBrush.CreateSolidBrush(RGB(225, 50,225));
+	blackBrush.CreateSolidBrush(RGB( 10, 10, 10));
 	CBrush* pOldBrush = (CBrush*)bufDC.SelectObject(&brush);
 
 	bufDC.FillRect(m_region, &brush);
 	bufDC.FillRect(m_redRegn, &redBrush);
 	bufDC.FillRect(m_blueRegn, &blueBrush);
 	bufDC.FillRect(m_pupleRegn, &pupleBrush);
+	bufDC.FillRect(m_blackRegn, &blackBrush);
 
 	bufDC.SelectObject(pOldBrush);
 	brush.DeleteObject();
 	redBrush.DeleteObject();
 	blueBrush.DeleteObject();
 	pupleBrush.DeleteObject();
+	blackBrush.DeleteObject();
 
 	bufDC.SelectObject(pOldBmp);
 	bufDC.DeleteDC();
 }
 
-// void CMSPaint::setPointer(CHandPoint handPt)
-// {
-// 	// cam input 크기 320, 240 -> mspaint region 으로 변환
-// 	m_pt.x = handPt.m_nX*(m_region.Width()/240.f);
-// 	m_pt.y = handPt.m_nY*(m_region.Height()/180.f);
-// 
-// 	if(m_pt.x >= m_region.Width()-1)
-// 		m_pt.x = m_region.Width()-1;
-// 	if(m_pt.y >= m_region.Height()-1)
-// 		m_pt.y = m_region.Height()-1;
-// 
-// 	TCHAR buf[256] = {0,};
-// 	swprintf(buf, _T("%d\t%d\t%s\t%s\n"), m_pt.x, m_pt.y, handPt.m_bClick ? _T("TRUE") : _T("FALSE"), handPt.m_bWheel ? _T("TRUE") : _T("FALSE"));
-// 	::OutputDebugString(buf);
-// 
-// //   	if(m_redRegn.PtInRect(pt))
-// // 	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::RED);	handPt.m_bClick = FALSE;	}
-// // 	else if(m_blueRegn.PtInRect(pt))
-// // 	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLUE);	handPt.m_bClick = FALSE;	}
-// // 	else if(m_pupleRegn.PtInRect(pt))
-// // 	{	((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::PUPLE);	handPt.m_bClick = FALSE;	}
-// 
-// 	if(handPt.m_bClick)
-// 		clickPointer();
-// // 	else if(handPt.m_bWheel)
-// // 		wheelPointer();
-// 	else
-// 		movePointer();
-// }
-
-void CMSPaint::convertScreenToMSPaintPt(int* x, int* y)
+void CMSPaint::setPointer(CHandPoint handPt)
 {
-	*x *= (m_region.Width()/240.f);
-	*y *= (m_region.Height()/180.f);
+	// cam input 크기 320, 240 -> mspaint region 으로 변환
+	m_pt.x = handPt.m_nX*(m_region.Width()/240.f);
+	m_pt.y = handPt.m_nY*(m_region.Height()/180.f);
 
-	if(*x >= m_region.Width()-1)
-		*x = m_region.Width()-1;
-	if(*y >= m_region.Height()-1)
-		*y = m_region.Height()-1;
+	if(m_pt.x >= m_region.Width()-1)
+		m_pt.x = m_region.Width()-1;
+	if(m_pt.y >= m_region.Height()-1)
+		m_pt.y = m_region.Height()-1;
+
+	TCHAR buf[256] = {0,};
+	swprintf(buf, _T("%d\t%d\t%s\t%s\n"), m_pt.x, m_pt.y, handPt.m_bClick ? _T("TRUE") : _T("FALSE"), handPt.m_bWheel ? _T("TRUE") : _T("FALSE"));
+	::OutputDebugString(buf);
+
+	if(handPt.m_bClick)
+		clickPointer();
+	else
+		movePointer();
 }
 
-void CMSPaint::movePointer(int x, int y)
+void CMSPaint::movePointer(unsigned short x, unsigned short y)
 {
 	CClientDC dc(this);
 
 	CDC bufDC;
 	bufDC.CreateCompatibleDC(&dc);
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
-
-	convertScreenToMSPaintPt(&x, &y);
 
 	m_Mouse.MoveWindow(x, y, MOUSEWIDTH, MOUSEHEIGHT, FALSE);
 	m_pastPt.x = x, m_pastPt.y = y;
@@ -170,7 +152,17 @@ void CMSPaint::movePointer(int x, int y)
 	this->Invalidate();
 }
 
-void CMSPaint::clickPointer(int x, int y)
+void CMSPaint::movePointer()
+{
+	movePointer(m_pt.x, m_pt.y);
+}
+
+void CMSPaint::clickPointer()
+{
+	clickPointer(m_pt.x, m_pt.y);
+}
+
+void CMSPaint::clickPointer(unsigned short x, unsigned short y)
 {
 	CClientDC dc(this);
 
@@ -182,13 +174,11 @@ void CMSPaint::clickPointer(int x, int y)
 	pen.CreatePen(PS_SOLID, 1, m_color);
 	CPen* pOldPen = (CPen*)bufDC.SelectObject(&pen);
 
-	convertScreenToMSPaintPt(&x, &y);
-
 	if(m_pastPt.x > m_region.Width() || m_pastPt.y > m_region.Height())
 		m_pastPt.x = x, m_pastPt.y = y;
 
 	bufDC.MoveTo(m_pastPt.x, m_pastPt.y);
-	bufDC.LineTo(x, y);
+	bufDC.LineTo(x,y);
 	m_Mouse.MoveWindow(x, y, MOUSEWIDTH, MOUSEHEIGHT, FALSE);
 	m_pastPt.x = x, m_pastPt.y = y;
 
@@ -201,24 +191,29 @@ void CMSPaint::clickPointer(int x, int y)
 	this->Invalidate();
 }
 
-// void CMSPaint::wheelPointer()
-// {
-// 	((CwpRobotver20Dlg*)(this->GetParent()))->m_setting.DoModal();
-// }
+int CMSPaint::inColorRegn(int x, int y)
+{
+	POINT pt;
+	pt.x = x*(m_region.Width()/240.f);
+	pt.y = y*(m_region.Height()/180.f);
 
-// void CMSPaint::OnPaint()
-// {
-// 	CPaintDC dc(this); // device context for painting
-// 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
-// 	// 그리기 메시지에 대해서는 CWnd::OnPaint()을(를) 호출하지 마십시오.
-// 
-// 	CDC bufDC;
-// 	bufDC.CreateCompatibleDC(&dc);
-// 
-// 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
-// 
-// 	dc.BitBlt(0, 0, m_region.Width(), m_region.Height(), &bufDC, 0, 0, SRCCOPY);
-// 
-// 	bufDC.SelectObject(pOldBmp);
-// 	bufDC.DeleteDC();
-// }
+	if(pt.x >= m_region.Width()-1)
+		pt.x = m_region.Width()-1;
+	if(pt.y >= m_region.Height()-1)
+		pt.y = m_region.Height()-1;
+
+  	if(m_redRegn.PtInRect(pt))
+	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::RED);*/
+		m_color = RGB(255,115,115);			return (int)(CwpRobotver20Dlg::RED);	}
+	else if(m_blueRegn.PtInRect(pt))
+	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLUE);*/
+		m_color = RGB(115,115,255);			return (int)(CwpRobotver20Dlg::BLUE);	}
+	else if(m_pupleRegn.PtInRect(pt))
+	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::PUPLE);*/
+		m_color = RGB(225, 50,225);			return (int)(CwpRobotver20Dlg::PUPLE);	}
+	else if(m_blackRegn.PtInRect(pt))
+	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLACK);*/
+		m_color = RGB( 10, 10, 10);			return (int)(CwpRobotver20Dlg::BLACK);	}
+	else
+	{	return (int)(CwpRobotver20Dlg::NOTHING);	}
+}

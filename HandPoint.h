@@ -12,3 +12,14 @@ public:
 	BOOL m_bClick;
 	BOOL m_bWheel;
 };
+
+enum COLOR { RED = 1, BLUE = 2, PUPLE = 4, BLACK = 8, NOTHING = 0 };
+		//   0001	  0010		0100	   1000
+
+typedef struct _sendData
+{
+	COLOR _color;
+	unsigned short _x, _y;		// 0 ~ 65535
+} SENDDATA;
+
+// sizeof (SENDDATA) == 8
