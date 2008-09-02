@@ -264,7 +264,7 @@ CHandPoint CTransformImage::findFinger()
 	unsigned char ch;
 	for(int y = m_center.y; y < height; ++y)
 	{
-		for(int x = m_center.x-100; x < m_center.x+20; ++x)
+		for(int x = m_center.x-100; x < m_center.x+40; ++x)
 		{
 			if(x < 0 || x >= width || y < 0 || y >= height)
 				continue;
