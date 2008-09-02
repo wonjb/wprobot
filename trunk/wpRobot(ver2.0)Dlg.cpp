@@ -46,14 +46,14 @@ BOOL CwpRobotver20Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
-//	this->SetWindowPos(NULL, 0, 0, 640+5+240+5, 480+5+5+10, SWP_NOMOVE);
-// 	if(!m_cam.Create(NULL, WS_CHILD|WS_VISIBLE, CRect(640+5,480+5-220,640+5+320,480+5), this))
-// 		return FALSE;
 	if(!m_cam.Create(NULL, WS_CHILD|WS_VISIBLE, CRect(640+5,480+5-180,640+5+240,480+5), this))
 		return FALSE;
 
 	if(!m_paint.Create(NULL, NULL, WS_CHILD|WS_VISIBLE, CRect(0+5,0+5,640+5,480+5), this, 1))
 		return FALSE;
+
+	m_setting = new CSettingDlg;
+	m_setting->Create(IDD_SETTINGDLG, this);
 
 	this->GetClientRect(&m_region);
 
@@ -94,4 +94,10 @@ void CwpRobotver20Dlg::OnPaint()
 HCURSOR CwpRobotver20Dlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+void CwpRobotver20Dlg::RunSettingDlg()
+{
+//	m_setting.DoModal();
+	m_setting->SetFocus();
 }

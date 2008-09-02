@@ -4,8 +4,6 @@
 #include "stdafx.h"
 #include "wpRobot(ver2.0).h"
 #include "Cam.h"
-#include "TransformImage.h"
-#include "Transmit.h"
 
 
 
@@ -66,6 +64,7 @@ void CCam::OnDestroy()
 }
 
 CTransformImage g_transform;
+CTransmit       g_transmit;
 void cvcamCallBack(IplImage* image)
 {
 	g_transform.setOriginImage(image);
@@ -73,7 +72,7 @@ void cvcamCallBack(IplImage* image)
 	g_transform.deleteNoise();
 	g_transform.drawTransImage(550, 250, 320, 230);
 
-	CTransmit transmit(g_transform.findFinger());
-	transmit.transmitWindow();
-//	transmit.transmitRobot();
+	g_transmit.setHandPointer(g_transform.findFinger());
+	g_transmit.transmitWindow();
+	g_transmit.transmitRobot();
 }

@@ -39,10 +39,6 @@ void CTransformImage::setOriginImage(IplImage* image)
 
 void CTransformImage::drawTransImage(int x, int y, int width, int height)
 {
-// 	CvvImage image;
-// 	image.CopyOf(m_transImage, m_transImage->nChannels*8);
-// 	image.Show(m_pDC->GetSafeHdc(), x, y, width, height);
-
 	cvShowImage(WINNAME, m_transImage);
 }
 
@@ -283,7 +279,7 @@ CHandPoint CTransformImage::findFinger()
 			break;
 	}
 
-	int y = abs(moveY-m_center.y)/2+m_center.y;
+	int y = abs(moveY-m_center.y)*2/3+m_center.y;
 	for(int x = moveX+20; x < moveX+50; ++x)
 	{
 		if(x < 0 || x >= width)
@@ -295,6 +291,12 @@ CHandPoint CTransformImage::findFinger()
 			bWheel = TRUE;
 			break;
 		}
+
+		CvBox2D box;
+		box.center = cvPoint2D32f(x, y);
+		box.size   = cvSize2D32f(2, 2);
+		box.angle  = 90;
+		cvEllipseBox(m_image, box, CV_RGB(0,255,0), 1);
 	}
 
 	// 좌표가 조금씩 흔들리는 것을 방지하기 위한 부분
