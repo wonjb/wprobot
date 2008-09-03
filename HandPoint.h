@@ -3,18 +3,20 @@
 class CHandPoint
 {
 public:
-	CHandPoint() : m_nX(0), m_nY(0), m_bClick(FALSE), m_bWheel(FALSE) {}
-	CHandPoint(int _x, int _y, BOOL _click = FALSE, BOOL _wheel = FALSE) 
-		: m_nX(_x), m_nY(_y), m_bClick(_click), m_bWheel(_wheel) {}
+	enum MODE { SETTING, MOVE, DRAW, CLEAR, CIRCLE, TRIANGE, RECT, STAR, NOTHING };
 
 public:
-	int  m_nX, m_nY;
-	BOOL m_bClick;
-	BOOL m_bWheel;
+	CHandPoint() : m_mode(NOTHING), m_nX(0), m_nY(0) {}
+	CHandPoint(MODE mode) : m_mode(mode), m_nX(0), m_nY(0) {}
+	CHandPoint(MODE mode, int x, int y) : m_mode(mode), m_nX(x), m_nY(y) {}
+
+public:
+	MODE m_mode;
+	unsigned short m_nX, m_nY;
 };
 
 enum COLOR { RED = 1, BLUE = 2, PUPLE = 4, BLACK = 8, NOTHING = 0 };
-		//   0001	  0010		0100	   1000
+//   0001	  0010		0100	   1000
 
 typedef struct _sendData
 {

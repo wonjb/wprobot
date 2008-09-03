@@ -333,3 +333,80 @@ void CTransformImage::deleteHole()
 	}
 }
 
+CHandPoint CTransformImage::findFingerInfo()
+{
+	if(!m_transImage)
+		return CHandPoint();
+
+	findCenter();
+
+	CHandPoint handPt;
+	std::vector<CvPoint> ptList;
+
+	double pi = 3.1415;
+	int width = m_transImage->width;
+	int fingerCnt = 0;
+	int x, y, radius = 80;
+	unsigned char ch, pastCh = 0;
+	for(double theta = 180; theta <= 360; ++theta)
+	{
+		x = (int)(m_center.x + radius*cos(theta*pi/180));
+		y = (int)(m_center.y - radius*sin(theta*pi/180));
+
+		ch = m_transImage->imageData[y*width+x];
+		if(ch == 255 && pastCh == 0)		// Counting Finger
+			ptList.push_back(cvPoint(x,y)), ++fingerCnt;
+
+		pastCh = ch;
+
+		// Draw OutLine
+		CvBox2D box;
+		box.center = cvPoint2D32f(x, y);
+		box.size   = cvSize2D32f(1, 1);
+		box.angle  = 90;
+		cvEllipseBox(m_image, box, CV_RGB(255,242,0), 1);
+	}
+
+	// handPt Setting
+	float dist = 0, dist2 = 0;
+	switch(fingerCnt)
+	{
+	case 0: handPt.m_mode = CHandPoint::CLEAR;
+		break;
+	case 1: handPt.m_mode = CHandPoint::MOVE;	findEndPoint(&handPt.m_nX, &handPt.m_nY);
+		break;
+	case 2:
+		{
+			CvPoint a = ptList[0], b = ptList[1];
+			float dist = sqrt((float)(abs(a.x-b.x)*abs(a.x-b.x) + abs(a.y-b.y)*abs(a.y-b.y)));
+			if(dist < 70)		// DRAW mode
+			{	handPt.m_mode = CHandPoint::CIRCLE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;	}
+			else
+			{	handPt.m_mode = CHandPoint::DRAW;	findEndPoint(&handPt.m_nX, &handPt.m_nY);	}
+		}
+		break;
+	case 3: 
+		{
+			CvPoint a = ptList[0], b = ptList[1], c = ptList[2];
+			dist  = sqrt((float)(abs(a.x-b.x)*abs(a.x-b.x) + abs(a.y-b.y)*abs(a.y-b.y)));
+			dist2 = sqrt((float)(abs(c.x-b.x)*abs(c.x-b.x) + abs(c.y-b.y)*abs(c.y-b.y)));
+			if(abs(dist-dist2) < 10)
+			{	handPt.m_mode = CHandPoint::TRIANGE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;	}
+			else
+			{	handPt.m_mode = CHandPoint::SETTING;	}
+		}
+		break;
+	case 4: handPt.m_mode = CHandPoint::RECT;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;
+		break;
+	case 5: handPt.m_mode = CHandPoint::STAR;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;
+		break;
+	default: handPt.m_mode = CHandPoint::NOTHING;
+		break;
+	}
+
+	TCHAR buf[256] = {0,};
+	swprintf(buf, sizeof(buf), _T("%d\t%f\n"), fingerCnt, dist);
+	::OutputDebugString(buf);
+
+	return handPt;
+}

@@ -20,6 +20,7 @@ public:
 	afx_msg void OnDestroy();
 };
 
+extern BOOL            g_Main;
 extern CTransformImage g_transform;
 extern CTransmit       g_transmit;
 void cvcamCallBack(IplImage* image);

@@ -65,6 +65,7 @@ void CCam::OnDestroy()
 	cvcamExit();
 }
 
+BOOL            g_Main = TRUE;
 CTransformImage g_transform;
 CTransmit       g_transmit;
 void cvcamCallBack(IplImage* image)
@@ -76,7 +77,7 @@ void cvcamCallBack(IplImage* image)
 
 	((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_setting->drawImage(g_transform.m_transImage);
 
-	g_transmit.setHandPointer(g_transform.findFinger());
+	g_transmit.setHandPointer(g_transform.findFingerInfo());
 	g_transmit.transmitWindow();
 	g_transmit.transmitRobot();
 }
