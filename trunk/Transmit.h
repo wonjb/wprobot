@@ -16,11 +16,10 @@ public:
 
 private:
 	CHandPoint m_handPt;
+	CHandPoint m_pastPt;
 
 	CRect      m_winRegn;
 	CRect      m_robotRegn;
 
 	COLOR      m_color;
-public:
-	BOOL       m_continue;
 };

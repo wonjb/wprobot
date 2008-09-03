@@ -14,7 +14,7 @@ public:
 
 	void findSkinColor()	{ ThresholdYCbCr(); }
 	void deleteNoise()		{ Morphology(); /*deleteHole();*/ Labeling(); }
-	CHandPoint findFinger();
+	CHandPoint findFingerInfo();
 
 private:
 	void ThresholdYCbCr(int cbmin = 77, int cbmax = 127, int crmin = 133, int crmax = 173);
@@ -24,6 +24,7 @@ private:
 	void drawHandLine();
 	void Thinning();
 	CvPoint findCenter();
+	void findEndPoint(unsigned short* x, unsigned short* y);
 
 public:
 	IplImage* m_transImage;

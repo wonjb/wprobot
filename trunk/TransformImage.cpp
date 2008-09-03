@@ -246,72 +246,110 @@ CvPoint CTransformImage::findCenter()
 	return m_center;
 }
 
-CHandPoint CTransformImage::findFinger()
+CHandPoint CTransformImage::findFingerInfo()
 {
-	findCenter();
-
 	if(!m_transImage)
 		return CHandPoint();
 
-	int width   = m_transImage->width;
-	int height  = m_transImage->height;
-	int moveX   = 0,     moveY  = height;
-	BOOL bClick = FALSE, bWheel = FALSE;
-	unsigned char ch;
-	for(int y = m_center.y; y < height; ++y)
+	findCenter();
+
+ 	CHandPoint handPt;
+ 	std::vector<CvPoint> ptList;
+
+	double pi = 3.1415;
+	int width  = m_transImage->width;
+	int height = m_transImage->height;
+	int fingerCnt = 0;
+	int x, y, radius = 80;
+	unsigned char ch, pastCh = 0;
+	for(double theta = 180; theta <= 360; ++theta)
 	{
-		for(int x = m_center.x-100; x < m_center.x+40; ++x)
-		{
-			if(x < 0 || x >= width || y < 0 || y >= height)
-				continue;
+		x = (int)(m_center.x + radius*cos(theta*pi/180));
+		y = (int)(m_center.y - radius*sin(theta*pi/180));
 
-			ch = m_transImage->imageData[y*width+x];
-			if(ch == 255)
-			{
-				moveX = x, moveY = y;
-				if(x < m_center.x-50 && y < m_center.y+30)
-					bClick = TRUE;
-				break;
-			}
-		}
-
-		if(moveY != y)
-			break;
-	}
-
-	int y = abs(moveY-m_center.y)*2/3+m_center.y;
-	for(int x = moveX+20; x < moveX+50; ++x)
-	{
-		if(x < 0 || x >= width)
+		if(x < 0 || x >= width || y < 0 || y >= height)
 			continue;
 
 		ch = m_transImage->imageData[y*width+x];
-		if(ch == 255)
-		{
-			bWheel = TRUE;
-			break;
-		}
+		if(ch == 255 && pastCh == 0)		// Counting Finger
+			ptList.push_back(cvPoint(x,y)), ++fingerCnt;
 
+		pastCh = ch;
+
+		// Draw OutLine
 		CvBox2D box;
 		box.center = cvPoint2D32f(x, y);
-		box.size   = cvSize2D32f(2, 2);
+		box.size   = cvSize2D32f(1, 1);
 		box.angle  = 90;
-		cvEllipseBox(m_image, box, CV_RGB(0,255,0), 1);
+		cvEllipseBox(m_image, box, CV_RGB(255,242,0), 1);
 	}
 
-	// 좌표가 조금씩 흔들리는 것을 방지하기 위한 부분
-	if(abs(m_pastPt.x-moveX) < 2 || abs(m_pastPt.y-moveY) < 2)
-		moveX = m_pastPt.x, moveY = m_pastPt.y;
+	// handPt Setting
+	switch(fingerCnt)
+	{
+	case 0: handPt.m_mode = CHandPoint::CLEAR;
+		break;
+	case 1: handPt.m_mode = CHandPoint::MOVE;	findEndPoint(&handPt.m_nX, &handPt.m_nY);
+		break;
+	case 2:
+		{
+			CvPoint a = ptList[0], b = ptList[1];
+			float dist = sqrt((float)(abs(a.x-b.x)*abs(a.x-b.x) + abs(a.y-b.y)*abs(a.y-b.y)));
+			if(dist < 70)		// DRAW mode
+			{	handPt.m_mode = CHandPoint::CIRCLE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;	}
+			else
+			{	handPt.m_mode = CHandPoint::DRAW;	findEndPoint(&handPt.m_nX, &handPt.m_nY);	}
+		}
+		break;
+	case 3: 
+		{
+			CvPoint a = ptList[0], b = ptList[1];
+			float dist = sqrt((float)(abs(a.x-b.x)*abs(a.x-b.x) + abs(a.y-b.y)*abs(a.y-b.y)));
+			if(dist < 50)
+			{	handPt.m_mode = CHandPoint::TRIANGE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;	}
+			else
+			{	handPt.m_mode = CHandPoint::SETTING;	}
+		}
+		break;
+	case 4: handPt.m_mode = CHandPoint::RECT;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;
+		break;
+	case 5: handPt.m_mode = CHandPoint::STAR;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;
+		break;
+	default: handPt.m_mode = CHandPoint::NOTHING;
+		break;
+	}
 
-	m_pastPt.x = moveX, m_pastPt.y = moveY;
+	TCHAR buf[256] = {0,};
+	swprintf(buf, sizeof(buf), _T("%d\n"), fingerCnt);
+	::OutputDebugString(buf);
 
-	CvBox2D box;
-	box.center = cvPoint2D32f(moveX, moveY);
-	box.size   = cvSize2D32f(2, 2);
-	box.angle  = 90;
-	cvEllipseBox(m_image, box, CV_RGB(0,255,0), 1);
+	return handPt;
+}
 
-	return CHandPoint(moveX, height-moveY, bClick, bWheel);
+void CTransformImage::findEndPoint(unsigned short* x, unsigned short* y)
+{
+	int width   = m_transImage->width;
+	int height  = m_transImage->height;
+	unsigned char ch;
+	for(int ty = m_center.y; ty < height; ++ty)
+	{
+		for(int tx = m_center.x-100; tx < m_center.x+40; ++tx)
+		{
+			if(tx < 0 || tx >= width || ty < 0 || ty >= height)
+				continue;
+
+			ch = m_transImage->imageData[ty*width+tx];
+			if(ch == 255)
+			{
+				*x = tx, *y = ty;
+				break;
+			}
+		}
+		if(*y != ty)
+			break;
+	}
+
+	*y = height - *y;
 }
 
 void CTransformImage::deleteHole()
