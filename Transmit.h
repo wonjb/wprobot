@@ -7,10 +7,17 @@ public:
 	CTransmit();
 	~CTransmit(void);
 
-	void setHandPointer(CHandPoint handPt);
+	void Initalize();
 	void setWindowRegn();
 	void setRobotRegn();
 
+	void setHandPointer(CHandPoint handPt);
+	void convertCIRCLE  (CRect regn);
+	void convertRECT    (CRect regn);
+	void convertTRIANGLE(CRect regn);
+	void convertSTAR    (CRect regn);
+
+	void Transmit();
 	void transmitWindow();
 	void transmitRobot();
 
