@@ -39,7 +39,7 @@ CMSPaint::~CMSPaint()
 BEGIN_MESSAGE_MAP(CMSPaint, CWnd)
 	ON_WM_ERASEBKGND()
 	ON_WM_CREATE()
-//	ON_WM_PAINT()
+	//	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -58,6 +58,7 @@ int CMSPaint::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	this->GetClientRect(&m_region);
 	Initialize();
+	InitializeRegn();
 
 	return 0;
 }
@@ -87,6 +88,17 @@ void CMSPaint::Initialize()
 	bufDC.CreateCompatibleDC(&dc);
 
 	m_bufBmp.CreateCompatibleBitmap(&dc, m_region.Width(), m_region.Height());
+
+	bufDC.DeleteDC();
+}
+
+void CMSPaint::InitializeRegn()
+{
+	CClientDC dc(this);
+
+	CDC bufDC;
+	bufDC.CreateCompatibleDC(&dc);
+
 	CBitmap* pOldBmp = (CBitmap*)bufDC.SelectObject(&m_bufBmp);
 
 	CBrush brush, redBrush, blueBrush, pupleBrush, blackBrush;
@@ -112,31 +124,26 @@ void CMSPaint::Initialize()
 
 	bufDC.SelectObject(pOldBmp);
 	bufDC.DeleteDC();
+
+	this->Invalidate();
 }
 
-void CMSPaint::setPointer(CHandPoint handPt)
+void CMSPaint::setPointer(unsigned short* x, unsigned short* y)
 {
 	// cam input 크기 320, 240 -> mspaint region 으로 변환
-	m_pt.x = handPt.m_nX*(m_region.Width()/240.f);
-	m_pt.y = handPt.m_nY*(m_region.Height()/180.f);
+	*x *= (m_region.Width()/240.f);
+	*y *= (m_region.Height()/180.f);
 
-	if(m_pt.x >= m_region.Width()-1)
-		m_pt.x = m_region.Width()-1;
-	if(m_pt.y >= m_region.Height()-1)
-		m_pt.y = m_region.Height()-1;
-
-	TCHAR buf[256] = {0,};
-	swprintf(buf, _T("%d\t%d\t%s\t%s\n"), m_pt.x, m_pt.y, handPt.m_bClick ? _T("TRUE") : _T("FALSE"), handPt.m_bWheel ? _T("TRUE") : _T("FALSE"));
-	::OutputDebugString(buf);
-
-	if(handPt.m_bClick)
-		clickPointer();
-	else
-		movePointer();
+	if(*x >= m_region.Width()-1)
+		*x = m_region.Width()-1;
+	if(*y >= m_region.Height()-1)
+		*y = m_region.Height()-1;
 }
 
 void CMSPaint::movePointer(unsigned short x, unsigned short y)
 {
+	setPointer(&x, &y);
+
 	CClientDC dc(this);
 
 	CDC bufDC;
@@ -152,18 +159,10 @@ void CMSPaint::movePointer(unsigned short x, unsigned short y)
 	this->Invalidate();
 }
 
-void CMSPaint::movePointer()
-{
-	movePointer(m_pt.x, m_pt.y);
-}
-
-void CMSPaint::clickPointer()
-{
-	clickPointer(m_pt.x, m_pt.y);
-}
-
 void CMSPaint::clickPointer(unsigned short x, unsigned short y)
 {
+	setPointer(&x, &y);
+
 	CClientDC dc(this);
 
 	CDC bufDC;
@@ -201,8 +200,11 @@ int CMSPaint::inColorRegn(int x, int y)
 		pt.x = m_region.Width()-1;
 	if(pt.y >= m_region.Height()-1)
 		pt.y = m_region.Height()-1;
+	
+// 	POINT pt;
+// 	pt.x = x, pt.y = y;
 
-  	if(m_redRegn.PtInRect(pt))
+	if(m_redRegn.PtInRect(pt))
 	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::RED);*/
 		m_color = RGB(255,115,115);			return (int)(CwpRobotver20Dlg::RED);	}
 	else if(m_blueRegn.PtInRect(pt))

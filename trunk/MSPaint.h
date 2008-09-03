@@ -13,13 +13,14 @@ public:
 	CMSPaint();
 	virtual ~CMSPaint();
 
-	void setPointer  (CHandPoint handPt);
+	void setPointer  (unsigned short* x, unsigned short* y);
 	void movePointer ();
 	void movePointer (unsigned short x, unsigned short y);
 	void clickPointer();
 	void clickPointer(unsigned short x, unsigned short y);
 
 	void Initialize();
+	void InitializeRegn();
 	CRect getMSPaintRegn()	{ return m_region; }
 
 	int  inColorRegn(int x, int y);
@@ -33,7 +34,7 @@ private:
 
 	CBitmap m_bufBmp;		// 더블버퍼링을 위한 Bitmap
 
-	POINT m_pt, m_pastPt;	// 바로 전 좌표를 저장하기 위한 변수
+	POINT m_pastPt;	// 바로 전 좌표를 저장하기 위한 변수
 
 protected:
 	DECLARE_MESSAGE_MAP()
