@@ -198,7 +198,7 @@ void CMSPaint::clickPointer(unsigned short x, unsigned short y)
 	::OutputDebugString(buf);
 }
 
-int CMSPaint::inColorRegn(int x, int y)
+COLOR CMSPaint::inColorRegn(int x, int y)
 {
 	POINT pt;
 	pt.x = x*(m_region.Width()/240.f);
@@ -209,21 +209,18 @@ int CMSPaint::inColorRegn(int x, int y)
 	if(pt.y >= m_region.Height()-1)
 		pt.y = m_region.Height()-1;
 	
-// 	POINT pt;
-// 	pt.x = x, pt.y = y;
-
 	if(m_redRegn.PtInRect(pt))
 	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::RED);*/
-		m_color = RGB(255,115,115);			return (int)(CwpRobotver20Dlg::RED);	}
+		m_color = RGB(255,115,115);			return (RED);	}
 	else if(m_blueRegn.PtInRect(pt))
 	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLUE);*/
-		m_color = RGB(115,115,255);			return (int)(CwpRobotver20Dlg::BLUE);	}
+		m_color = RGB(115,115,255);			return (BLUE);	}
 	else if(m_pupleRegn.PtInRect(pt))
 	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::PUPLE);*/
-		m_color = RGB(225, 50,225);			return (int)(CwpRobotver20Dlg::PUPLE);	}
+		m_color = RGB(225, 50,225);			return (PUPLE);	}
 	else if(m_blackRegn.PtInRect(pt))
 	{	/*((CwpRobotver20Dlg*)(this->GetParent()))->ColorAnimation(CwpRobotver20Dlg::BLACK);*/
-		m_color = RGB( 10, 10, 10);			return (int)(CwpRobotver20Dlg::BLACK);	}
+		m_color = RGB( 10, 10, 10);			return (BLACK);	}
 	else
-	{	return (int)(CwpRobotver20Dlg::NOTHING);	}
+	{	return (NOTHING);	}
 }

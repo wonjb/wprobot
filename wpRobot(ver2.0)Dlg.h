@@ -22,8 +22,6 @@ public:
 
 // 작업입니다.
 public:
-	enum COLOR{ RED = 1, BLUE = 2, PUPLE = 4, BLACK = 8, NOTHING = 0 };
-public:
 	CCam         m_cam;
 	CMSPaint     m_paint;
 	CSettingDlg* m_setting;

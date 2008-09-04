@@ -23,7 +23,7 @@ public:
 	void InitializeRegn();
 	CRect getMSPaintRegn()	{ return m_region; }
 
-	int  inColorRegn(int x, int y);
+	COLOR inColorRegn(int x, int y);
 
 private:
 	CMouse m_Mouse;			// mouse Window

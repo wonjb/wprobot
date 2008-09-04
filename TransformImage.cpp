@@ -295,7 +295,7 @@ CHandPoint CTransformImage::findFingerInfo()
 		{
 			CvPoint a = ptList[0], b = ptList[1];
 			float dist = sqrt((float)(abs(a.x-b.x)*abs(a.x-b.x) + abs(a.y-b.y)*abs(a.y-b.y)));
-			if(dist < 70)		// DRAW mode
+			if(dist < 50)		// DRAW mode
 			{	handPt.m_mode = CHandPoint::CIRCLE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;	}
 			else
 			{	handPt.m_mode = CHandPoint::DRAW;	findEndPoint(&handPt.m_nX, &handPt.m_nY);	}

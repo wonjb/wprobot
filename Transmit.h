@@ -2,7 +2,6 @@
 #include "HandPoint.h"
 #include "SendRobot.h"
 
-
 class CTransmit
 {
 public:
@@ -20,7 +19,6 @@ public:
 
 	void Transmit();
 	void transmitWindow();
-	void transmitRobot();
 
 private:
 	CHandPoint m_handPt;
@@ -29,7 +27,7 @@ private:
 	CSendRobot m_robot;
 
 	CRect      m_winRegn;
-	COLOR      m_color;
+//	COLOR      m_color;
 };
 
 struct PARAM
