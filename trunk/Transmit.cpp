@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Transmit.h"
 
 #include "wpRobot(ver2.0).h"
@@ -9,7 +9,6 @@
 CTransmit::CTransmit()
 : m_handPt(CHandPoint::NOTHING)
 , m_pastPt(CHandPoint::NOTHING)
-, m_startRobot(FALSE)
 {
 }
 
@@ -20,17 +19,11 @@ CTransmit::~CTransmit(void)
 void CTransmit::Initalize()
 {
 	setWindowRegn();
-	setRobotRegn();
 }
 
 void CTransmit::setWindowRegn()
 {
 	m_winRegn = ((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint.getMSPaintRegn();
-}
-
-void CTransmit::setRobotRegn()
-{
-	m_robotRegn.SetRect(0,0,240,180);
 }
 
 void CTransmit::setHandPointer(CHandPoint handPt)
@@ -40,17 +33,8 @@ void CTransmit::setHandPointer(CHandPoint handPt)
 
 void CTransmit::Transmit()
 {
-	CwpRobotver20Dlg* pDlg = (CwpRobotver20Dlg*)(theApp.m_pMainWnd);
 	transmitWindow();
-
-	if(m_startRobot == FALSE)
-		pDlg->SetWindowText(_T("Robot Send End!"));
-	else
-	{
-		pDlg->SetWindowText(_T("Robot Send Start!"));
-		transmitRobot();
-	}
-
+	transmitRobot();
 	m_pastPt = m_handPt;
 }
 
@@ -72,11 +56,13 @@ void CTransmit::transmitWindow()
 // 	case CHandPoint::STAR: convertSTAR(m_winRegn);
 // 		return;
 	case CHandPoint::DRAW: pPaint->clickPointer(m_handPt.m_nX,m_handPt.m_nY);
+//						   m_robot.SendPointer(m_handPt.m_nX,m_handPt.m_nY);
 		break;
 	case CHandPoint::MOVE: pPaint->movePointer(m_handPt.m_nX,m_handPt.m_nY);
 						   m_color = (COLOR)pPaint->inColorRegn(m_handPt.m_nX,m_handPt.m_nY);
 		break;
-	case CHandPoint::CLEAR: m_startRobot = !m_startRobot;
+	case CHandPoint::CLEAR: m_robot.CComStart() == TRUE ? ((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->SetWindowText(_T("Robot Send Start!"))
+														: ((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->SetWindowText(_T("Robot Send End!"));
 							pPaint->InitializeRegn();
 		break;
 	case CHandPoint::SETTING: 
@@ -88,21 +74,23 @@ void CTransmit::transmitWindow()
 
 void CTransmit::transmitRobot()
 {
-	unsigned short x, y;
-	// cam input 크기 240, 180 -> Robot region 으로 변환
-	x = m_handPt.m_nX*(m_robotRegn.Width()/240.f);
-	y = m_handPt.m_nY*(m_robotRegn.Height()/180.f);
+// 	unsigned short x, y;
+// 	// cam input 크기 240, 180 -> Robot region 으로 변환
+// 	x = m_handPt.m_nX*(m_robotRegn.Width()/240.f);
+// 	y = m_handPt.m_nY*(m_robotRegn.Height()/180.f);
+// 
+// 	if(x >= m_winRegn.Width()-1)
+// 		x = m_winRegn.Width()-1;
+// 	if(y >= m_winRegn.Height()-1)
+// 		y = m_winRegn.Height()-1;
+// 
+// 	// Send to Robot
+// 	SENDDATA data;
+// 	data._color = m_color;
+// 	data._x     = x;
+// 	data._y     = y;
 
-	if(x >= m_winRegn.Width()-1)
-		x = m_winRegn.Width()-1;
-	if(y >= m_winRegn.Height()-1)
-		y = m_winRegn.Height()-1;
 
-	// Send to Robot
-	SENDDATA data;
-	data._color = m_color;
-	data._x     = x;
-	data._y     = y;
 }
 
 void CTransmit::convertCIRCLE(CRect regn)
@@ -137,3 +125,4 @@ DWORD WINAPI CallBackDrawCIRCLE(LPVOID lpParam)
 
 	return 0;
 }
+
