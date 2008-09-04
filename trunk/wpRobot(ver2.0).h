@@ -34,3 +34,5 @@ public:
 };
 
 extern CwpRobotver20App theApp;
+
+enum COLOR{ RED = 1, BLUE = 2, PUPLE = 4, BLACK = 8, NOTHING = 0 };

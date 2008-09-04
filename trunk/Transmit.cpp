@@ -34,7 +34,6 @@ void CTransmit::setHandPointer(CHandPoint handPt)
 void CTransmit::Transmit()
 {
 	transmitWindow();
-	transmitRobot();
 	m_pastPt = m_handPt;
 }
 
@@ -47,8 +46,8 @@ void CTransmit::transmitWindow()
 	CMSPaint* pPaint = &(((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint);
 	switch(m_handPt.m_mode)
 	{
-//	case CHandPoint::CIRCLE: ::CloseHandle(::CreateThread(NULL, NULL, CallBackDrawCIRCLE, pParam, 0, 0));
-//		return;
+	case CHandPoint::CIRCLE: ::CloseHandle(::CreateThread(NULL, NULL, CallBackDrawCIRCLE, pParam, 0, 0));
+		return;
 // 	case CHandPoint::RECT: convertRECT(m_winRegn);
 // 		return;
 // 	case CHandPoint::TRIANGE: convertTRIANGLE(m_winRegn);
@@ -56,10 +55,10 @@ void CTransmit::transmitWindow()
 // 	case CHandPoint::STAR: convertSTAR(m_winRegn);
 // 		return;
 	case CHandPoint::DRAW: pPaint->clickPointer(m_handPt.m_nX,m_handPt.m_nY);
-//						   m_robot.SendPointer(m_handPt.m_nX,m_handPt.m_nY);
+						   m_robot.SendPointer(m_handPt.m_nX,m_handPt.m_nY);
 		break;
 	case CHandPoint::MOVE: pPaint->movePointer(m_handPt.m_nX,m_handPt.m_nY);
-						   m_color = (COLOR)pPaint->inColorRegn(m_handPt.m_nX,m_handPt.m_nY);
+						   m_robot.SetColor(pPaint->inColorRegn(m_handPt.m_nX,m_handPt.m_nY));
 		break;
 	case CHandPoint::CLEAR: m_robot.CComStart() == TRUE ? ((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->SetWindowText(_T("Robot Send Start!"))
 														: ((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->SetWindowText(_T("Robot Send End!"));
@@ -72,43 +71,28 @@ void CTransmit::transmitWindow()
 	delete pParam;
 }
 
-void CTransmit::transmitRobot()
-{
-// 	unsigned short x, y;
-// 	// cam input 크기 240, 180 -> Robot region 으로 변환
-// 	x = m_handPt.m_nX*(m_robotRegn.Width()/240.f);
-// 	y = m_handPt.m_nY*(m_robotRegn.Height()/180.f);
-// 
-// 	if(x >= m_winRegn.Width()-1)
-// 		x = m_winRegn.Width()-1;
-// 	if(y >= m_winRegn.Height()-1)
-// 		y = m_winRegn.Height()-1;
-// 
-// 	// Send to Robot
-// 	SENDDATA data;
-// 	data._color = m_color;
-// 	data._x     = x;
-// 	data._y     = y;
-
-
-}
-
 void CTransmit::convertCIRCLE(CRect regn)
 {
 	int x, y, tx, ty;
 	double pi = 3.1415;
 	int radius = 50;
 
+	CwpRobotver20Dlg* pDlg = (CwpRobotver20Dlg*)(theApp.m_pMainWnd);
+
 	tx = (unsigned short)(m_handPt.m_nX + radius*cos(360*pi/180));
 	ty = (unsigned short)(m_handPt.m_nY - radius*sin(360*pi/180));
+	pDlg->m_paint.movePointer(tx, ty);
 
 	for(double theta = 0; theta <= 360; ++theta)
 	{
 		x = (unsigned short)(m_handPt.m_nX + radius*cos(theta*pi/180));
 		y = (unsigned short)(m_handPt.m_nY - radius*sin(theta*pi/180));
 
-		((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint.movePointer(tx,ty);
-		((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint.clickPointer(x,y);
+		pDlg->m_paint.clickPointer(tx, ty);
+		m_robot.SendPointer(x, y);
+
+//		pDlg->m_paint.movePointer(tx,ty);
+//		pDlg->m_paint.clickPointer(x,y);
 
 		tx = x, ty = y;
 
