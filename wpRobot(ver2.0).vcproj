@@ -222,11 +222,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Comm.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Mouse.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\MSPaint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SendRobot.cpp"
 				>
 			</File>
 			<File
@@ -280,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Comm.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HandPoint.h"
 				>
 			</File>
@@ -293,6 +305,10 @@
 			</File>
 			<File
 				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SendRobot.h"
 				>
 			</File>
 			<File

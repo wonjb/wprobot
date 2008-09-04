@@ -1,5 +1,7 @@
 #pragma once
 #include "HandPoint.h"
+#include "SendRobot.h"
+
 
 class CTransmit
 {
@@ -9,7 +11,6 @@ public:
 
 	void Initalize();
 	void setWindowRegn();
-	void setRobotRegn();
 
 	void setHandPointer(CHandPoint handPt);
 	void convertCIRCLE  (CRect regn);
@@ -25,11 +26,10 @@ private:
 	CHandPoint m_handPt;
 	CHandPoint m_pastPt;
 
-	CRect      m_winRegn;
-	CRect      m_robotRegn;
+	CSendRobot m_robot;
 
+	CRect      m_winRegn;
 	COLOR      m_color;
-	BOOL       m_startRobot;
 };
 
 struct PARAM
