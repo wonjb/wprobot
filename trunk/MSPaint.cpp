@@ -157,6 +157,10 @@ void CMSPaint::movePointer(unsigned short x, unsigned short y)
 	bufDC.DeleteDC();
 
 	this->Invalidate();
+
+	TCHAR buf[256] = {0,};
+	swprintf(buf, sizeof(buf), _T("MOVE: %d\t%d\n"), x,y);
+	::OutputDebugString(buf);
 }
 
 void CMSPaint::clickPointer(unsigned short x, unsigned short y)
@@ -188,6 +192,10 @@ void CMSPaint::clickPointer(unsigned short x, unsigned short y)
 	bufDC.DeleteDC();
 
 	this->Invalidate();
+
+	TCHAR buf[256] = {0,};
+	swprintf(buf, sizeof(buf), _T("CLICK: %d\t%d\n"), x,y);
+	::OutputDebugString(buf);
 }
 
 int CMSPaint::inColorRegn(int x, int y)

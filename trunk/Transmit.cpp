@@ -9,6 +9,7 @@
 CTransmit::CTransmit()
 : m_handPt(CHandPoint::NOTHING)
 , m_pastPt(CHandPoint::NOTHING)
+, m_startRobot(FALSE)
 {
 }
 
@@ -39,8 +40,16 @@ void CTransmit::setHandPointer(CHandPoint handPt)
 
 void CTransmit::Transmit()
 {
+	CwpRobotver20Dlg* pDlg = (CwpRobotver20Dlg*)(theApp.m_pMainWnd);
 	transmitWindow();
-//	transmitRobot();
+
+	if(m_startRobot == FALSE)
+		pDlg->SetWindowText(_T("Robot Send End!"));
+	else
+	{
+		pDlg->SetWindowText(_T("Robot Send Start!"));
+		transmitRobot();
+	}
 
 	m_pastPt = m_handPt;
 }
@@ -50,11 +59,12 @@ void CTransmit::transmitWindow()
 	if(m_pastPt.m_mode == m_handPt.m_mode && (m_handPt.m_mode != CHandPoint::DRAW && m_handPt.m_mode != CHandPoint::MOVE))
 		return;
 
+	PARAM* pParam = new PARAM((int*)this, m_winRegn);
 	CMSPaint* pPaint = &(((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint);
 	switch(m_handPt.m_mode)
 	{
-	case CHandPoint::CIRCLE: convertCIRCLE(m_winRegn);
-		return;
+//	case CHandPoint::CIRCLE: ::CloseHandle(::CreateThread(NULL, NULL, CallBackDrawCIRCLE, pParam, 0, 0));
+//		return;
 // 	case CHandPoint::RECT: convertRECT(m_winRegn);
 // 		return;
 // 	case CHandPoint::TRIANGE: convertTRIANGLE(m_winRegn);
@@ -66,11 +76,14 @@ void CTransmit::transmitWindow()
 	case CHandPoint::MOVE: pPaint->movePointer(m_handPt.m_nX,m_handPt.m_nY);
 						   m_color = (COLOR)pPaint->inColorRegn(m_handPt.m_nX,m_handPt.m_nY);
 		break;
-	case CHandPoint::CLEAR: pPaint->InitializeRegn();
+	case CHandPoint::CLEAR: m_startRobot = !m_startRobot;
+							pPaint->InitializeRegn();
 		break;
 	case CHandPoint::SETTING: 
 		break;
 	}
+
+	delete pParam;
 }
 
 void CTransmit::transmitRobot()
@@ -94,18 +107,33 @@ void CTransmit::transmitRobot()
 
 void CTransmit::convertCIRCLE(CRect regn)
 {
-	CHandPoint tempPt = m_handPt;
-
+	int x, y, tx, ty;
 	double pi = 3.1415;
-	int radius = regn.Height()/2;
+	int radius = 50;
+
+	tx = (unsigned short)(m_handPt.m_nX + radius*cos(360*pi/180));
+	ty = (unsigned short)(m_handPt.m_nY - radius*sin(360*pi/180));
+
 	for(double theta = 0; theta <= 360; ++theta)
 	{
-		m_handPt.m_mode = CHandPoint::DRAW;
-		m_handPt.m_nX = (unsigned short)(m_handPt.m_nX + radius*cos(theta*pi/180));
-		m_handPt.m_nY = (unsigned short)(m_handPt.m_nY - radius*sin(theta*pi/180));
+		x = (unsigned short)(m_handPt.m_nX + radius*cos(theta*pi/180));
+		y = (unsigned short)(m_handPt.m_nY - radius*sin(theta*pi/180));
 
-		setHandPointer(m_handPt);
-		Transmit();
-		m_handPt = tempPt;
+		((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint.movePointer(tx,ty);
+		((CwpRobotver20Dlg*)(theApp.m_pMainWnd))->m_paint.clickPointer(x,y);
+
+		tx = x, ty = y;
+
+// 		setHandPointer(m_handPt);
+// 		Transmit();
+//		m_handPt = tempPt;
 	}
+}
+
+DWORD WINAPI CallBackDrawCIRCLE(LPVOID lpParam)
+{
+	PARAM* pParam = (PARAM*)lpParam;
+	((CTransmit*)(pParam->m_address))->convertCIRCLE(pParam->m_rt);
+
+	return 0;
 }

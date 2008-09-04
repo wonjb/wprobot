@@ -29,4 +29,16 @@ private:
 	CRect      m_robotRegn;
 
 	COLOR      m_color;
+	BOOL       m_startRobot;
 };
+
+struct PARAM
+{
+	int*  m_address;
+	CRect m_rt;
+
+	PARAM() {}
+	PARAM(int* address, CRect rt) : m_address(address), m_rt(rt) {}
+};
+
+DWORD WINAPI CallBackDrawCIRCLE(LPVOID lpParam);
