@@ -222,10 +222,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Comm.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Mouse.cpp"
 				>
 			</File>
@@ -235,6 +231,22 @@
 			</File>
 			<File
 				RelativePath=".\SendRobot.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SerialComClass.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SerialComClass.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SerialCtl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SerialCtl.h"
 				>
 			</File>
 			<File
@@ -285,10 +297,6 @@
 			>
 			<File
 				RelativePath=".\Cam.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Comm.h"
 				>
 			</File>
 			<File

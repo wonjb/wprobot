@@ -9,10 +9,14 @@
 #endif
 
 #define WINNAME		"Binary Test"
+#define MAX_COUNT	1
 
 
 CTransformImage::CTransformImage(void)
-: m_image(NULL), m_transImage(NULL)
+: m_image(NULL)
+, m_transImage(NULL)
+, m_lkStart(FALSE)
+, m_isTracking(FALSE)
 {
 	cvNamedWindow(WINNAME);
 }
@@ -48,6 +52,7 @@ void CTransformImage::ThresholdYCbCr(int cbmin /*= 77*/, int cbmax /*= 127*/, in
 		cvReleaseImage(&m_transImage);
 
 	m_transImage = cvCreateImage(cvGetSize(m_image), IPL_DEPTH_8U, 1);
+	m_lkStart    = TRUE;
 
 	int height = m_image->height;
 	int width  = m_image->width;
@@ -237,6 +242,8 @@ CvPoint CTransformImage::findCenter()
 	if(m_center.x < 0 || m_center.y < 0)
 		m_center.x = 0, m_center.y = 0;
 
+//	m_lkPoints[0] = cvPointFrom32f()
+
 	CvBox2D box;
 	box.center = cvPoint2D32f(m_center.x, m_center.y);
 	box.size   = cvSize2D32f(3, 3);
@@ -302,14 +309,13 @@ CHandPoint CTransformImage::findFingerInfo()
 		}
 		break;
 	case 3: 
-		{
-			CvPoint a = ptList[0], b = ptList[1];
-			float dist = sqrt((float)(abs(a.x-b.x)*abs(a.x-b.x) + abs(a.y-b.y)*abs(a.y-b.y)));
-			if(dist < 50)
-			{	handPt.m_mode = CHandPoint::TRIANGE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;	}
-			else
-			{	handPt.m_mode = CHandPoint::SETTING;	}
-		}
+			handPt.m_mode = CHandPoint::TRIANGE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;
+// 			CvPoint a = ptList[0], b = ptList[1];
+// 			float dist = sqrt((float)(abs(a.x-b.x)*abs(a.x-b.x) + abs(a.y-b.y)*abs(a.y-b.y)));
+// 			if(dist < 50)
+// 			{	handPt.m_mode = CHandPoint::TRIANGE;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;	}
+// 			else
+// 			{	handPt.m_mode = CHandPoint::SETTING;	}
 		break;
 	case 4: handPt.m_mode = CHandPoint::RECT;	handPt.m_nX = m_center.x, handPt.m_nY = m_center.y;
 		break;
@@ -327,7 +333,6 @@ CHandPoint CTransformImage::findFingerInfo()
 										   handPt.m_mode == CHandPoint::DRAW    ? _T("DRAW")    :
 										   handPt.m_mode == CHandPoint::MOVE    ? _T("MOVE")    :
 										   handPt.m_mode == CHandPoint::CLEAR   ? _T("CLEAR")   :
-										   handPt.m_mode == CHandPoint::SETTING ? _T("SETTING") :
 																				  _T("NOTHING"));
 	::OutputDebugString(buf);
 
@@ -390,3 +395,63 @@ void CTransformImage::deleteHole()
 	}
 }
 
+void CTransformImage::Tracking()
+{
+	IplImage* dstImage = cvCreateImage(cvGetSize(m_transImage), IPL_DEPTH_8U, 1);
+
+	if(m_lkStart){
+		m_lkGrey = m_lkPrevGrey = m_lkPyramid = m_lkPrevPyramid = 0;
+		m_lkGrey = cvCreateImage(cvGetSize(m_transImage),IPL_DEPTH_8U,1);
+		m_lkPrevGrey = cvCreateImage(cvGetSize(m_transImage),IPL_DEPTH_8U,1);
+		m_lkPyramid = cvCreateImage(cvGetSize(m_transImage),IPL_DEPTH_8U,1);
+		m_lkPrevPyramid = cvCreateImage(cvGetSize(m_transImage),IPL_DEPTH_8U,1);
+		m_lkStart=false;
+		m_lkFlag=0;
+		m_lkStatus = (char*)cvAlloc(MAX_COUNT);
+	}
+
+	cvCvtColor(m_transImage,m_lkGrey,CV_BGR2GRAY);
+	int win_size=10;
+	int i=0, k=0;
+
+	if(m_isTracking == false)
+	{
+		cvFindCornerSubPix(m_lkGrey,m_lkPoints[1],m_lkCount,cvSize(win_size,win_size),cvSize(-1,-1),
+		cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
+		m_isTracking = true;
+	}
+	else if( m_lkCount > 0 )
+	{
+		cvCalcOpticalFlowPyrLK( m_lkPrevGrey, m_lkGrey, m_lkPrevPyramid, m_lkPyramid,
+		m_lkPoints[0], m_lkPoints[1], m_lkCount, cvSize(win_size,win_size), 3, m_lkStatus, 0,
+		cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), m_lkFlag );
+
+		m_lkFlag |= CV_LKFLOW_PYR_A_READY;
+		for( i = k = 0; i < m_lkCount; i++ )
+		{
+			if( !m_lkStatus[i] )
+				continue;
+			m_lkPoints[1][k++] = m_lkPoints[1][i];			
+			cvCircle( dstImage, cvPointFrom32f(m_lkPoints[1][i]), 3, CV_RGB(255,255,0), -1, 8,0);
+		}
+
+		m_lkCount = k;
+	}
+	if(m_lkCount<MAX_COUNT/5){
+		m_isTracking = false;
+		m_lkCount=0;
+		cvFree((void**)&m_lkPoints[0]);
+		m_lkPoints[0] = (CvPoint2D32f*)cvAlloc(MAX_COUNT*sizeof(m_lkPoints[0][0]));
+		if(m_lkGrey) cvReleaseImage(&m_lkGrey);
+		if(m_lkPrevGrey) cvReleaseImage(&m_lkPrevGrey);
+		if(m_lkPyramid) cvReleaseImage(&m_lkPyramid);
+		if(m_lkPrevPyramid) cvReleaseImage(&m_lkPrevPyramid);
+		m_lkGrey = m_lkPrevGrey = m_lkPyramid = m_lkPrevPyramid = 0;
+		m_lkStart = true;
+		m_lkFlag=0;
+	}
+
+	CV_SWAP( m_lkPrevGrey, m_lkGrey, m_lkSwapTemp );
+	CV_SWAP( m_lkPrevPyramid, m_lkPyramid, m_lkSwapTemp );
+	CV_SWAP( m_lkPoints[0], m_lkPoints[1], m_lkSwapPoints );
+}
