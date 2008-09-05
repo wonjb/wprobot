@@ -20,7 +20,6 @@ void CTransmit::setHandPointer(CHandPoint handPt)
 #include "wpRobot(ver2.0).h"
 #include "wpRobot(ver2.0)Dlg.h"
 
-#pragma warning(disable:4244)
 
 CTransmit::CTransmit()
 : m_handPt(CHandPoint::NOTHING)
@@ -91,7 +90,7 @@ void CTransmit::transmitWindow()
 
 void CTransmit::transmitRobot()
 {
-	unsigned short x, y;
+	int x, y;
 	// cam input 크기 240, 180 -> Robot region 으로 변환
 	x = m_handPt.m_nX*(m_robotRegn.Width()/240.f);
 	y = m_handPt.m_nY*(m_robotRegn.Height()/180.f);
@@ -117,8 +116,8 @@ void CTransmit::convertCIRCLE(CRect regn)
 	for(double theta = 0; theta <= 360; ++theta)
 	{
 		m_handPt.m_mode = CHandPoint::DRAW;
-		m_handPt.m_nX = (unsigned short)(m_handPt.m_nX + radius*cos(theta*pi/180));
-		m_handPt.m_nY = (unsigned short)(m_handPt.m_nY - radius*sin(theta*pi/180));
+		m_handPt.m_nX = (int)(m_handPt.m_nX + radius*cos(theta*pi/180));
+		m_handPt.m_nY = (int)(m_handPt.m_nY - radius*sin(theta*pi/180));
 
 		// 		setHandPointer(m_handPt);
 		// 		Transmit();

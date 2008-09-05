@@ -24,7 +24,7 @@ private:
 	void drawHandLine();
 	void Thinning();
 	CvPoint findCenter();
-	void findEndPoint(unsigned short* x, unsigned short* y);
+	void findEndPoint(int* x, int* y);
 
 public:
 	IplImage* m_transImage;

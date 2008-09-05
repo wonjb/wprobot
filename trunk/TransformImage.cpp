@@ -320,13 +320,21 @@ CHandPoint CTransformImage::findFingerInfo()
 	}
 
 	TCHAR buf[256] = {0,};
-	swprintf(buf, sizeof(buf), _T("%d\n"), fingerCnt);
+	swprintf(buf, sizeof(buf), _T("%s\n"), handPt.m_mode == CHandPoint::CIRCLE  ? _T("CIRCLE")  :
+										   handPt.m_mode == CHandPoint::RECT    ? _T("RECT")    :
+										   handPt.m_mode == CHandPoint::TRIANGE ? _T("TRIANGE") :
+										   handPt.m_mode == CHandPoint::STAR    ? _T("STAR")    :
+										   handPt.m_mode == CHandPoint::DRAW    ? _T("DRAW")    :
+										   handPt.m_mode == CHandPoint::MOVE    ? _T("MOVE")    :
+										   handPt.m_mode == CHandPoint::CLEAR   ? _T("CLEAR")   :
+										   handPt.m_mode == CHandPoint::SETTING ? _T("SETTING") :
+																				  _T("NOTHING"));
 	::OutputDebugString(buf);
 
 	return handPt;
 }
 
-void CTransformImage::findEndPoint(unsigned short* x, unsigned short* y)
+void CTransformImage::findEndPoint(int* x, int* y)
 {
 	int width   = m_transImage->width;
 	int height  = m_transImage->height;
