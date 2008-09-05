@@ -2,6 +2,15 @@
 #include "HandPoint.h"
 #include "SendRobot.h"
 
+struct PARAM
+{
+	void* m_address;
+	CRect m_rt;
+
+	PARAM() {}
+	PARAM(void* address, CRect rt) : m_address(address), m_rt(rt) {}
+};
+
 class CTransmit
 {
 public:
@@ -23,20 +32,13 @@ public:
 private:
 	CHandPoint m_handPt;
 	CHandPoint m_pastPt;
-
 	CSendRobot m_robot;
+	PARAM      m_pParam;
 
 	CRect      m_winRegn;
-//	COLOR      m_color;
 };
 
-struct PARAM
-{
-	int*  m_address;
-	CRect m_rt;
-
-	PARAM() {}
-	PARAM(int* address, CRect rt) : m_address(address), m_rt(rt) {}
-};
-
-DWORD WINAPI CallBackDrawCIRCLE(LPVOID lpParam);
+DWORD WINAPI CallBackDrawCIRCLE  (LPVOID lpParam);
+DWORD WINAPI CallBackDrawRECT    (LPVOID lpParam);
+DWORD WINAPI CallBackDrawTRIANGLE(LPVOID lpParam);
+DWORD WINAPI CallBackDrawSTAR    (LPVOID lpParam);

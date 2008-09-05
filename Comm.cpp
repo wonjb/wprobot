@@ -392,7 +392,7 @@ BOOL CComm::WriteCommBlock( LPSTR lpByte , DWORD dwBytesToWrite)
 					if(dwErrorFlags > 0)
 					{
 						// CAN DISPLAY ERROR MESSAGE HERE
-						AfxMessageBox(_T("ERROR"));
+						AfxMessageBox(_T("Send ERROR"));
 					}
 					break;
 				}
@@ -405,7 +405,7 @@ BOOL CComm::WriteCommBlock( LPSTR lpByte , DWORD dwBytesToWrite)
 			if(dwErrorFlags > 0)
 			{
 				// CAN DISPLAY ERROR MESSAGE HERE				
-				AfxMessageBox(_T("ERROR"));
+				AfxMessageBox(_T("AAAA ERROR"));
 			}
 		}		
 	}

@@ -128,7 +128,7 @@ void CMSPaint::InitializeRegn()
 	this->Invalidate();
 }
 
-void CMSPaint::setPointer(unsigned short* x, unsigned short* y)
+void CMSPaint::setPointer(int* x, int* y)
 {
 	// cam input 크기 320, 240 -> mspaint region 으로 변환
 	*x *= (m_region.Width()/240.f);
@@ -140,7 +140,7 @@ void CMSPaint::setPointer(unsigned short* x, unsigned short* y)
 		*y = m_region.Height()-1;
 }
 
-void CMSPaint::movePointer(unsigned short x, unsigned short y)
+void CMSPaint::movePointer(int x, int y)
 {
 	setPointer(&x, &y);
 
@@ -163,7 +163,7 @@ void CMSPaint::movePointer(unsigned short x, unsigned short y)
 	::OutputDebugString(buf);
 }
 
-void CMSPaint::clickPointer(unsigned short x, unsigned short y)
+void CMSPaint::clickPointer(int x, int y)
 {
 	setPointer(&x, &y);
 

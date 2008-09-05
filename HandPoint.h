@@ -12,5 +12,5 @@ public:
 
 public:
 	MODE m_mode;
-	unsigned short m_nX, m_nY;
+	int m_nX, m_nY;
 };

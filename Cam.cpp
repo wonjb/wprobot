@@ -77,5 +77,9 @@ void cvcamCallBack(IplImage* image)
 
 	g_transmit.Initalize();
 	g_transmit.setHandPointer(g_transform.findFingerInfo());
-	g_transmit.Transmit();
+	if(g_Main)
+	{
+		g_transmit.Transmit();
+		g_Main = FALSE;
+	}
 }

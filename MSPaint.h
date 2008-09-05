@@ -13,11 +13,11 @@ public:
 	CMSPaint();
 	virtual ~CMSPaint();
 
-	void setPointer  (unsigned short* x, unsigned short* y);
+	void setPointer  (int* x, int* y);
 	void movePointer ();
-	void movePointer (unsigned short x, unsigned short y);
+	void movePointer (int x, int y);
 	void clickPointer();
-	void clickPointer(unsigned short x, unsigned short y);
+	void clickPointer(int x, int y);
 
 	void Initialize();
 	void InitializeRegn();
